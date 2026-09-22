@@ -1,7 +1,9 @@
 # security-learing
-记录学习网安笔记，靶场练习以及python脚本
-9.22
+#记录学习网安笔记，靶场练习以及python脚本
+#9.22
+#目标
 在kali中安装DVWA靶场
+#过程
 1.切换到root用户，检查发现kali中没有docker,开始采用apt install docker.io -y命令下载docker
 2.采用systemctl start docker,以及systemctl enable docker 开启docker,最后采用docker --version检查版本安装情况
 3.采用docker pull vulnerables/web-dvwa命令下载dvwa，网络请求超时换用apt install dvwa -y下载
