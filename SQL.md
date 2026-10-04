@@ -18,3 +18,15 @@
 ###踩坑
   **URL编码问题**：直接输入'-- '注释容易引发语法问题
   **解决**：使用#代替
+##SQL盲注实战
+### 手动探测（Burp Suite）
+   1.利用 `1' AND 1=1 #` 和 `1' AND 1=2 #` 判断页面回显差异，确认布尔盲注漏洞。
+   2.尝试使用 Burp Intruder 爆破字符（受限于社区版功能，需手动加载 `chars.txt` 字典）。
+### 自动化攻击（SQLMap）
+  **踩坑记录**：DVWA Session 极易过期，手动复制 Cookie 拼命令效率极低。
+  **解决方案**：利用 Burp 抓包保存为 `/tmp/req.txt` 文件，直接使用 `sqlmap -r /tmp/req.txt` 读取请求，绕过手动拼凑 Session 的烦恼。
+### 战果（一步到位的拖库）
+  命令：`sqlmap -r /tmp/req.txt -D dvwa -T users --dump --batch`
+  成功导出所有用户数据，并自动完成了 MD5 哈希爆破（如 `admin:password`、`gordonb:abc123`）。
+
+  
