@@ -45,9 +45,40 @@
 **目标**：对可疑软件进行分析
 **命令**
  1.file suspicious.exe:查看文件什么格式【东西的真面目】
- 2.string suspicious.exe | head:抽取文件内容显示隐藏文本【情报获取】
+ 2.strings suspicious.exe | head:抽取文件内容显示隐藏文本【情报获取】
  3.sha256sum suspicious.exe:计算哈希值【提取指纹】
  4.vt-lookup <hash>：将拿到的指纹去查询【全网通缉】
  ##总结
  红队：找到漏洞，进行搜索看看有没有类似的，借鉴前人工具，离线破解避免痕迹泄露
  蓝队：发现可疑软件，进行内容提取，下达通缉令
+
+###模块七：局域网中间人攻击（HITM）
+**武器库**：bettercap、tcpdump
+**攻击链**：
+ 1.ifconfig eth0:确认攻击方IP，看看处于什么网段【战前准备，查看武器以及埋伏地点】
+ 2.bettercap -iface eth0:bettercap局域网攻击武器，伪装MAC作为中间人截胡数据【诱骗上当】
+ 3.tcpdump -i eth0 -A port 80:tcpdump抓包工具
+                               -i eth0监听网卡
+                               -A 以ASCII码显示数据内容
+                                port 80抓取80端口【获取数据】
+###模块八：社会工程学钓鱼（SET）
+**武器库**：setoolkit
+**攻击链**：
+ 1.setoolkit&set-pick2:社会工程学包，set-pick2"万能钥匙"【在工具库里制造一把万能钥匙】
+ 2.clone https://portal.megacorp.local/login:网页克隆【一个假场景】
+ 3.send-mail staff@megacorp.local:伪装发送邮件【一个钓鱼邮件】
+##总结
+利用人性的弱点，诱导点击导致文件泄露
+
+###模块九：拒绝服务与缓解（DoS）
+**目标**：防守恶意攻击
+**命令**：
+ 1.hping3 --fiood -S -p 80 10.10.10.5:--flood:洪水模式，疯狂发包
+                                      -S发送SYN包（第一次请求握手）【红队攻击，不断打电话，导致占线】
+ 2.netstat-target:察看作战现场【看看什么情况】
+ 3.mitigate syn:企业防火墙【解决方案】
+
+##总结
+红队最大的攻击目标实际是人，利用人性的弱点诱导上当，导致核心泄露
+蓝队不仅仅要死守防火墙还要注意人在里面参与的部分
+
