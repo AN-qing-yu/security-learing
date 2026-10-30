@@ -21,3 +21,38 @@
 ##总结
 红队：注意信息收集，注意URL
 蓝队：预判攻击者的预判，在编写代码时使用安全性更高的
+
+##关卡三：SQL injection attack, querying the database type and version on MySQL and Microsoft（MYSQL数据库版本查看）
+**目标**：利用SQL注入查询MYSQL版本
+**解决方案**：1.确定返回数量列数以及包含哪些文本数据：使用'union+select+'abc','def'#（官方解析）/ORDER BY 1-- -【探路小兵，看看有几列】，UNION SELECT 1,2 -- -【找显示位】
+             2.输入攻击Payload:'+UNION+SELECT+@@version,+NULL#（官方解析）/'UNION SELECT @@version,NULL -- -'
+**原理**：'(单引号)闭合后端SQL准备好的SQL语句【依旧闭合】
+          UNION SELECT:SQL联合查询语句【粘合剂】
+          @@version:系统内置全局变量【版本号提取】
+          ，NULL：占位
+          -- -：--单行注释符，-确保有空格
+**扩展**：MYSQL：@@version/version()
+         Oracle:v$version/banner【很强】
+         PostgreSQL:version()
+
+##关卡四：SQL injection attack, querying the database type and version on Oracle（Oracle数据库版本查看）
+**目标**：拿到Oracle版本
+**攻击Payload**:'+UNION+SELECT+BANNER,+NULL+FROM+v$version--
+**原理**：'(单引号)：闭合
+          +代替空格
+          UNION SELECT 数据库查询语句
+          BANNER，v$version：Oracle数据库的版本查询语句
+          NULL占位
+          FROM来自哪
+**思考与总结**：1.Oracle：必须有FROM，没有写dual(虚拟表)
+               2.对数据类型要求很严格（'+UNION+SELECT+'abc','def'+FROM+dual--利用这一条测试）
+               3.查版本用v$version
+
+##总结
+1.数据库常用查询SELECT ...FROM..
+2.--注释符，#也可以，但是它在URL编码中会出问题
+3.总的来说套路一致：首先现用单引号闭合，测数据库中表的列数，查想要的数据，最后注释
+
+
+
+
