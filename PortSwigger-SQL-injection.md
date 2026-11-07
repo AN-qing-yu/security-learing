@@ -106,6 +106,21 @@
 
 ##总结：要拿到数据库里的用户名，密码，必须按数据库的规则来，先查所有表【看看都叫什么】，再查列【找到目标表，查列，看看这个表里有什么】，最后将列和表结合按数据库的规矩来【毕竟是人家的地盘】
 
+##关卡十：Blind SQL injection with conditional responses（盲注，数据库只会回答是或不是需要靠猜）
+**目标**：拿到管理员密码
+**攻击**：1.采用BP抓包，抓一段请求报文（Reuest），在请求报文中包含了Payload,cookie(登陆凭证),将其发送到Repeater
+          2.在抓获的请求报文里找到Cookie:TrackingId=     Session=    ,在TrackingId的值后面加上'AND 1=1 -- -，点击Send，在返回报文中查找是否含有Welcome Back!
+          3.将payload替换' AND 1=2 -- -,点击Send，查看是否有Welcome Back!
+          4.确认完成后，替换payload为'AND (SELECT 'x' FROM users WHERE username='administrator')='x' -- -,点击Send，返回Welcome Back!证明用户存在
+          5.替换Payload为' AND (SELECT LENGTH(password) FROM uers WHERE username='administrator')=20 -- -,如果出现Welcome Back!证明密码长度为20，如果没有就继续尝试
+          6.猜到长度后开始一位一位爆破，建议写一个Python脚本，BP也可以，也可以采用kali自带工具SQLmap（使用麻烦，速度慢）
+            BP使用：将请求发送给Intruder,找到之前的payload改为：'AND SUBSTRING((SELECT password FROM users WHERE username='administrator'),1,1)='？' -- -,？处就是你要猜字母或数字,长度最长的就是              找的密码
+          7.等到密码爆破成功，登录即可（用户名为administrator）
+**原理**：1.'LENGTH()'确认长度
+          2.'SUBSTRING（string,position,length）':逐字提取，每次提取一个字符
+
+##总结：盲注就是在数据库无法直接爆出密码时，采用‘逼问’的方式进行【只能猜】，好消息可以自动化完成【python脚本自动化】
+
 
 
 
