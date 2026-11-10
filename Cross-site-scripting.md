@@ -20,7 +20,7 @@
 **攻击payload**:<iframe src="https://YOUR-LAB-ID.web-security-academy.net/#" onload="this.src+='<img src=x onerror=print()>'"></iframe>
 **原理**：<iframe></iframe>(画中画)在当前网页里嵌入一个新的网页【卧底】
          src="https://YOUR-LAB-ID.web-security-academy.net/#"当前网页【潜伏地点】
-         onload:触发器，使之执行后续代码【接头人】
+         onload:触发器，使之执行后续代码【接头人】1.
          onerror:执行者，传送到<img>【接头人传递信息】
          onload="this.src+='<img src=x onerror=print()>执行<img>并输出内容
 ##总结：我方派出卧底【恶意代码】，在目标公司潜伏等待有缘人打开网站访问，然后传递信息给我【传到我的服务器】
@@ -39,5 +39,20 @@
 **攻击payload**:'-alert(1)-'
 **原理**：'（单引号）闭合前面字符串
           -（减号）强制JS引号将两边作为表达式执行，触发alert(1)
+
+##关卡十：DOM XSS in document.write sink using source location.search inside a select element
+**攻击payload**:在URLproduct?productId=1后面加上&storeId="></select><img%20src=1%20onerror=alert(1)>
+**原理**：1.&：URL中用来连接多个参数的分隔符
+          2.storeId:它是前端里写死的代码，查看页面源代码，搜索document.write,找到缺口
+          3."：闭合原本代码
+          4.>闭合标签
+          5.</select>强制关闭下拉标签
+          6.20%URL里的空格
+
+##关卡十一：DOM XSS in AngularJS expression with angle brackets and double quotes HTML-encoded
+**攻击payload**:{{$on.constructor('alert(1)')()}}
+**原理**：1.页面有 `ng-app`，AngularJS 会解析 `{{ }}` 里面的表达式，我们用 `$on.constructor` 绕过 AngularJS 的沙箱，执行原生 JS，这叫 **AngularJS CSTI（客户端模板注入）**
+          2.`$on`：是 AngularJS scope 自带的事件监听方法（`scope.$on`），它本身是一个**函数**
+          3.`.constructor`：任何 JS 函数的 `constructor` 就是 **原生 Function 构造器**
 
 
