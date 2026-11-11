@@ -55,4 +55,15 @@
           2.`$on`：是 AngularJS scope 自带的事件监听方法（`scope.$on`），它本身是一个**函数**
           3.`.constructor`：任何 JS 函数的 `constructor` 就是 **原生 Function 构造器**
 
+##关卡十二：Reflected DOM XSS【反射型】
+**攻击payload**:\"};alert(1)//
+**原理**：1.在输入框输入字符，跳转后点击F12，发现在searchResults.js中包含有eval()危险函数，会直接拼接执行eval('var searchResultsObj='+this.responseText);
+          2.在BP抓包中会有一段json{"searchTerm":"test"}
+          3.输入\"};alert(1)//，eval后的代码会变为'var searchResultsObj={"searchTerm":"\\"};alert(1)//"}'
+          4.\\被JS解释为反斜杠字符
+          5."（双引号）闭合了searchTerm
+          6.}闭合了对象
+          7.；（分号）结束了var声明
+          8.//将后面的全部注释，防止报错
+
 
