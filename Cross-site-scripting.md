@@ -66,4 +66,18 @@
           7.；（分号）结束了var声明
           8.//将后面的全部注释，防止报错
 
+##关卡十三：Reflected XSS into a JavaScript string with single quote and backslash escaped
+**攻击payload**:</script><img src=1 onerror=alert(1)>
+**原理**:1.</script>强行闭合<script>标签
+         2.<img src=1 onerror=alert(1)>然后写上自己想写的
+         【在抓包的时候你会看到响应报文document.write后面的内容，你输入的就会包含，要做的就是跳出它】
+
+##关卡十四：Reflected XSS in canonical link tag
+**攻击payload**:'accesskey='x'onclick='alert(1)
+**原理**：1. 第一个 `'`：闭合原来 href 属性的引号
+         2. `accesskey='x'`：新增 accesskey 属性，快捷键绑定字母 x
+         3. `onclick='alert(1)`：新增 onclick 事件，点击这个元素就弹框
+         4.`accesskey` 是 HTML 全局属性：给元素绑定一个键盘快捷键，在 Chrome 里按下对应快捷键，就会**聚焦这个元素，并且触发它的 onclick 事件**。
+
+
 
