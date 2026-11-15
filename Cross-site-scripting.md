@@ -79,5 +79,13 @@
          3. `onclick='alert(1)`：新增 onclick 事件，点击这个元素就弹框
          4.`accesskey` 是 HTML 全局属性：给元素绑定一个键盘快捷键，在 Chrome 里按下对应快捷键，就会**聚焦这个元素，并且触发它的 onclick 事件**。
 
+关卡十五：Reflected XSS into HTML context with most tags and attributes blocked【反射型，大部分标签被拦截】
+**攻击payload**:<iframe src="靶场URL?search=<body onresize=print()>" onload="this.style.width='100px' "></iframe>
+**原理**：1.同上关卡六描述
+          2.拦截了大部分标签但是不可能没有一个可用，采用BP攻击模块进行自动化筛选'<body>'可用
+          3.拦截了大部分触发，继续采用BP攻击模块'onresize'可用
+          4.onload="this.style.width='100px'：触发onload强制放大
+
+##总结：<iframe></iframe>一个合格的卧底，可以直接嵌入一个新的网页，onload一个高级放哨靠近就触发，不论什么标签都有可能成为注入点
 
 
