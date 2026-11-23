@@ -176,6 +176,23 @@ body:'csrf='+document.querySelector('input[name=csrf]').value+'&postId=1&comment
         postId=1【位置】
         comment='+username.value+':'+this.value将账号密码放一块贴到大屏【处理结果斩首示众】
         &name=Hacked&email=test%40test.com'【评论必填项】
+
+##关卡十九：Stored XSS into onclick event with angle brackets and double quotes HTML-encoded and single quotes and backslash escaped【html实体绕过】
+**攻击payload**:https://&apos;);alert(1);//
+**原理**：1.&apos浏览器解析onclick时将其翻译为单引号
+          2.所以实际JS执行会变为tracker.track('');alert(1);//');
+          3.前面强制闭合直接执行alert(1)实现弹框
+
+##关卡二十：Reflected XSS into a template literal with angle brackets, single, double quotes, backslash and backticks Unicode-escaped
+**攻击payload**:${alert(1)}
+**原理**：1.大部分常用标签被过滤
+          2.${}插值，大括号里的表达式会被强行计算
+          3.输入值被包含在单引号中，采用插值让JS强制执行
+
+##关卡二十一：Stored DOM XSS
+**攻击payload**:<><img src=1 onerror=alert(1)>
+**原理**：1.前端function escapeHTML(html) {return html.replace('<', '&lt;').replace('>', '&gt;');}这一段会将<>解析，所以要写一个空<>来占位
+          2.前面解析结束后，执行后面塞入的恶意代码<img src=1 onerror=alert(1)>
            
 
 
