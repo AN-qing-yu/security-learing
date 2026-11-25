@@ -205,6 +205,13 @@ location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+o
           4.tabindex=1让自定义标签接收到信号
           5.onfocus=alert(document.cookie)拿到焦点后执行JS
           6.#x:页面加载后自动跳转这个id，触发focus
+
+##关卡二十三：Reflected XSS with some SVG markup allowed【大部分标签过滤，使用SVG】
+**攻击payload**：<svg><animatetransform onbegin=alert(1)>
+**原理**：1.常规标签被过滤，采用BP批量化测试<svg>可用
+          2.<svg>外层容器合法，放行
+          3.<animatetransform>动画标签，放行
+          4.onbegin=alert(1)动画开始直接执行
            
 
 
