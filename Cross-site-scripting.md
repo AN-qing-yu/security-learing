@@ -213,13 +213,13 @@ location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+o
           3.<animatetransform>动画标签，放行
           4.onbegin=alert(1)动画开始直接执行
            
-
-
-
-             
-          
-
-
-
-
-
+##关卡二十四：Reflected XSS with event handlers and href attributes blocked
+**攻击payload**:<svg><a><animate attributeName=href values=javascript:alert(1) /><text x=20 y=20>Click me</text></a>
+**原理**：1.<svg>(矢量图)，建立一个画布，让后面的代码直接在画布里执行，不受html限制
+          2.<a></a>在画布里建立一个超链接，一个图形框
+          3.<animate attributeName=herf values=javascript:alert(1) />
+              animate:SVG动画标签，动态效果
+              attributeName=herf:让标签里的东西动起来
+              values=javascript:alert(1):标签里的恶意代码【实际搞破坏的】
+              注：因为WAF检查静态源码，这个是动态，不在他的检查范围内
+          4.<text x=20 y=20>Click me</text>显示一个页面，点我，点击后触发恶意代码
